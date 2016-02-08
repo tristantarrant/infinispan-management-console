@@ -8,10 +8,16 @@ angular.module('managementConsole')
     'utils',
     'modelController',
     function ($scope, $state, $stateParams, utils, modelController) {
-      if (!$stateParams.clusterName && !$stateParams.cacheName) {
-        $state.go('error404');
-      }
       $scope.clusters = modelController.getServer().getClusters();
       $scope.currentCluster = modelController.getServer().getCluster($scope.clusters, $stateParams.clusterName);
+      $scope.fileToUpload = null;
+      $scope.uploadDMR = function (){
+        var op = {
+          address: [{deployment: "custom-store.jar"}],
+          operation: "add",
+          enabled: "true"
+        };
+        modelController.uploadFile(op, $scope.fileToUpload, function(){});
+      };
 
     }]);

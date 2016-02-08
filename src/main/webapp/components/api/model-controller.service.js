@@ -12,6 +12,7 @@ angular.module('managementConsole.api')
              * @param {string} url - the URL to the ModelController management endpoint
              */
             var ModelControllerClient = function (url) {
+                this.uploadUrl = url + '/management-upload';
                 this.url = url + '/management';
                 this.authenticated = false;
                 this.credentials = {
@@ -107,6 +108,63 @@ angular.module('managementConsole.api')
                 };
                 http.send(JSON.stringify(op));
                 return deferred.promise;
+            };
+
+            ModelControllerClient.prototype.uploadFile = function(op, file, uploadProgress) {
+              var fd = new FormData();
+
+              var blob = new Blob([JSON.stringify(op)], {type : "application/json"});
+              fd.append('operation', blob);
+              fd.append('file', file);
+
+
+              console.log('Upload started');
+
+              var http = new XMLHttpRequest();
+
+              http.upload.addEventListener("progress", uploadProgress, false);
+
+              http.addEventListener("readystatechange", function (e) {
+                // upload completed
+                if (this.readyState === 4) {
+                  console.log('Success: Upload done', e);
+
+                  var response = e.target.response;
+
+                  if (response) {
+                    try {
+                      console.log("Got response " + response);
+                      response = JSON.parse(response);
+                    } catch (e) {
+                      console.log('JSON.parse()', e);
+                    }
+                  }
+
+                  //callback(false, response);
+                }
+
+                // xhr = null;
+              });
+
+              http.addEventListener("error", function (e) {
+                console.log('Error: Upload failed', e);
+                //callback(true);
+              });
+
+              if (this.credentials.username) {
+                http.withCredentials = true;
+                http.open('POST', this.uploadUrl, true, this.credentials.username, this.credentials.password);
+              } else {
+                http.open('POST', this.uploadUrl, true);
+              }
+
+
+              //special headers to prevent CSRF
+              http.setRequestHeader('X-Management-Client-Name', 'HAL');
+
+              // send the form data to the server
+              http.send(fd);
+
             };
 
             ModelControllerClient.prototype.readAttribute = function (address, name) {
