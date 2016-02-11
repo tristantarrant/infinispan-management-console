@@ -13,9 +13,11 @@ angular.module('managementConsole')
       $scope.fileToUpload = null;
       $scope.uploadDMR = function (){
         var op = {
-          address: [{deployment: "custom-store.jar"}],
           operation: "add",
-          enabled: "true"
+          address: [{deployment: "custom-store.jar"}],
+          'runtime-name':'custom-store.jar',
+          enabled: "false",
+          content: [{'input-stream-index':0}]
         };
         modelController.uploadFile(op, $scope.fileToUpload, function(){});
       };
