@@ -113,10 +113,9 @@ angular.module('managementConsole.api')
             ModelControllerClient.prototype.uploadFile = function(op, file, uploadProgress) {
               var fd = new FormData();
 
-              var blob = new Blob([JSON.stringify(op)], {type : "application/json"});
-              fd.append('operation', blob);
+              var blob = new Blob([JSON.stringify(op)], {type : "application/json"});              
               fd.append('file', file);
-
+              fd.append('operation', blob);
 
               console.log('Upload started');
 
